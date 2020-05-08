@@ -2,16 +2,15 @@ from openvino.inference_engine import IENetwork, IECore
 import cv2
 import numpy as np
 
-class FaceDetectionModel:
+class FacialLandmarksDetectionModel:
     '''
-    Class for the Face Detection Model.
+    Class for the Facial Landmarks Detection Model.
     '''
-    def __init__(self, model_name, device, threshold=0.60):
+    def __init__(self, model_name, device):
     
         self.model_weights=model_name+'.bin'
         self.model_structure=model_name+'.xml'
         self.device=device
-        self.threshold=threshold
         self.core = IECore()
         try:
             self.model = IENetwork(self.model_structure, self.model_weights)
@@ -36,40 +35,29 @@ class FaceDetectionModel:
         image = np.moveaxis(image, -1, 0)
         
         return image
-
+    
 
     def preprocess_outputs(self, outputs):
-
-        detections = outputs['detection_out'][-1,-1,:,:] # outputs['detection_out'] shape is 1x1x200x7
-
-        coords= []
-        for detection in detections: 
-            conf = detection[2]
-            if conf >= self.threshold:
-                xmin = detection[3]
-                ymin = detection[4]
-                xmax = detection[5]
-                ymax = detection[6]
-                
-                coords.append([xmin,ymin,xmax,ymax])
         
-        return coords
-    
-    
-    def get_coords(self, detections, image):
+        outputs = np.squeeze(next(iter(outputs.values())))
+        
+        return outputs
+        
+        
+    def get_coords(self, outputs, image):
     
         IMG_HEIGHT, IMG_WIDTH, _ = image.shape
+    
+        x_coords = outputs[0::2] * IMG_WIDTH
+        x_coords = [int(i) for i in x_coords]
+        
+        y_coords = outputs[1::2] * IMG_HEIGHT
+        y_coords = [int(i) for i in y_coords]
         
         coords = []
-        for detection in detections: 
-            # scale bbox coords
-            xmin = int(detection[0] * IMG_WIDTH)
-            ymin = int(detection[1] * IMG_HEIGHT)
-            xmax = int(detection[2] * IMG_WIDTH)
-            ymax = int(detection[3] * IMG_HEIGHT)
-            
-            coords.append([xmin,ymin,xmax,ymax])
-            
+        for x, y in zip(x_coords, y_coords):
+            coords.append([x, y])
+
         return coords
         
         

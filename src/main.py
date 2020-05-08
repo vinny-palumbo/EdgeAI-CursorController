@@ -8,6 +8,12 @@ from sys import platform
 
 from input_feeder import InputFeeder
 from model_face_detection import FaceDetectionModel
+from model_facial_landmarks_detection import FacialLandmarksDetectionModel
+
+
+PATH_MODELS_FOLDER = os.path.abspath(r'C:\Users\vin_p\Github\EdgeAI-CursorController\models\intel')
+PATH_MODEL_FACE_DETECTION = os.path.join(PATH_MODELS_FOLDER, r'face-detection-adas-binary-0001\FP32-INT1\face-detection-adas-binary-0001')
+PATH_MODEL_FACIAL_LANDMARKS_DETECTION = os.path.join(PATH_MODELS_FOLDER, r'landmarks-regression-retail-0009\FP32\landmarks-regression-retail-0009')
 
 # Get correct params according to the OS
 if platform == "darwin": # for MACs
@@ -36,6 +42,26 @@ def build_argparser():
 
     return parser
     
+
+def draw_landmarks(facial_landmarks_coords_crop, face_coords, image):
+
+    PAD = 5 # Padding pixel size
+    face_xmin, face_ymin, _, _ = face_coords
+    
+    for facial_landmark_coords_crop in facial_landmarks_coords_crop: 
+        
+        facial_landmark_x_crop = facial_landmark_coords_crop[0]
+        facial_landmark_y_crop = facial_landmark_coords_crop[1]
+        
+        facial_landmark_x = face_xmin + facial_landmark_x_crop
+        facial_landmark_y = face_ymin + facial_landmark_y_crop
+        
+        # draw landmark point on original frame
+        landmarks_color = (0,255,0) # green
+        image[facial_landmark_y-PAD: facial_landmark_y+PAD, facial_landmark_x-PAD: facial_landmark_x+PAD] = landmarks_color
+        
+    return image
+    
     
 def infer_on_stream(args):
     """
@@ -46,18 +72,19 @@ def infer_on_stream(args):
     :return: None
     """
     
-    # Initialise the class
-    path_model_face_detection = os.path.abspath(r'C:\Users\vin_p\Github\EdgeAI-CursorController\models\intel\face-detection-adas-binary-0001\FP32-INT1\face-detection-adas-binary-0001')
-    model_face_detection = FaceDetectionModel(path_model_face_detection, args.device, args.prob_threshold)
+    # Initialise the models
+    model_face_detection = FaceDetectionModel(PATH_MODEL_FACE_DETECTION, args.device, args.prob_threshold)
+    model_facial_landmarks_detection = FacialLandmarksDetectionModel(PATH_MODEL_FACIAL_LANDMARKS_DETECTION, args.device)
 
-    ### TODO: Load the model through `infer_network` ###
+    # Load the models
     model_face_detection.load_model()
+    model_facial_landmarks_detection.load_model()
     
     # Check if the input is a webcam
     if args.input == 'CAM':
         args.input = 0
     
-    ### TODO: Handle the input stream ###
+    # Handle the input stream 
     cap = cv2.VideoCapture(args.input)
     cap.open(args.input)
     CAP_WIDTH = int(cap.get(3))
@@ -66,21 +93,36 @@ def infer_on_stream(args):
     
     # Create a video writer for the output video
     out = cv2.VideoWriter('results/output_video.mp4', CODEC, CAP_FPS, (CAP_WIDTH,CAP_HEIGHT))
-
-    ### TODO: Loop until stream is over ###
+    
+    # Loop until stream is over 
     while cap.isOpened():
         
-        ### TODO: Read from the video capture ###
+        # Read from the video capture 
         flag, frame = cap.read()
         if not flag:
             break
         key_pressed = cv2.waitKey(60)
         
-        # get output
-        _, out_frame = model_face_detection.predict(frame)
-
-        ### TODO: Write out the frame, depending on image or video ###
-        out.write(out_frame)
+        # Get face detection crops
+        face_coords = model_face_detection.predict(frame)
+        if len(face_coords) > 1:
+            print('Multiple faces detected')
+            quit()
+        
+        # draw face detection bbox on original frame
+        face_coords = face_coords[0]
+        face_xmin, face_ymin, face_xmax, face_ymax = face_coords
+        frame_out = cv2.rectangle(frame, (face_xmin, face_ymin), (face_xmax, face_ymax), (0, 255, 0), 1)
+        
+        # Get the landmarks from the face crop
+        image_face = frame.copy()[face_ymin:face_ymax, face_xmin:face_xmax]
+        facial_landmarks_coords_crop = model_facial_landmarks_detection.predict(image_face)
+        
+        # draw facial landmarks
+        frame_out = draw_landmarks(facial_landmarks_coords_crop, face_coords, frame_out)
+        
+        # Write out the output frame 
+        out.write(frame_out)
         
         # Break if escape key pressed
         if key_pressed == 27:
