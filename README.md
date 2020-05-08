@@ -25,3 +25,12 @@ If you have used Async Inference in your code, benchmark the results and explain
 
 ### Edge Cases
 There will be certain situations that will break your inference flow. For instance, lighting changes or multiple people in the frame. Explain some of the edge cases you encountered in your project and how you solved them to make your project more robust.
+
+
+### Future improvements
+* improve inference speed without significant drop in performance by changing the precision of some of the models
+* benchmark the running times of different parts of the preprocessing and inference pipeline and let the user specify the CLI argument if they want to see the benchmark timing. Use the get_perf_counts API to print the time it takes for each layer in the model
+* use the VTune Amplifier to find hotspots in your Inference Engine Pipeline
+* Handle edge cases like multiple people in the video or change in lighting
+* add a toggle to the UI to shut off the camera feed and show stats only. How does this affects performance and power?
+* Allow the user to select their input option in the command line arguments 
