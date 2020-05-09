@@ -9,11 +9,13 @@ from sys import platform
 from input_feeder import InputFeeder
 from model_face_detection import FaceDetectionModel
 from model_facial_landmarks_detection import FacialLandmarksDetectionModel
+from model_head_pose_estimation import HeadPoseEstimationModel
 
 
 PATH_MODELS_FOLDER = os.path.abspath(r'C:\Users\vin_p\Github\EdgeAI-CursorController\models\intel')
 PATH_MODEL_FACE_DETECTION = os.path.join(PATH_MODELS_FOLDER, r'face-detection-adas-binary-0001\FP32-INT1\face-detection-adas-binary-0001')
 PATH_MODEL_FACIAL_LANDMARKS_DETECTION = os.path.join(PATH_MODELS_FOLDER, r'landmarks-regression-retail-0009\FP32\landmarks-regression-retail-0009')
+PATH_MODEL_HEAD_POSE_ESTIMATION = os.path.join(PATH_MODELS_FOLDER, r'head-pose-estimation-adas-0001\FP32\head-pose-estimation-adas-0001')
 
 # Get correct params according to the OS
 if platform == "darwin": # for MACs
@@ -75,10 +77,12 @@ def infer_on_stream(args):
     # Initialise the models
     model_face_detection = FaceDetectionModel(PATH_MODEL_FACE_DETECTION, args.device, args.prob_threshold)
     model_facial_landmarks_detection = FacialLandmarksDetectionModel(PATH_MODEL_FACIAL_LANDMARKS_DETECTION, args.device)
-
+    model_head_pose_estimation = HeadPoseEstimationModel(PATH_MODEL_HEAD_POSE_ESTIMATION, args.device)
+    
     # Load the models
     model_face_detection.load_model()
     model_facial_landmarks_detection.load_model()
+    model_head_pose_estimation.load_model()
     
     # Check if the input is a webcam
     if args.input == 'CAM':
@@ -113,13 +117,20 @@ def infer_on_stream(args):
         face_coords = face_coords[0]
         face_xmin, face_ymin, face_xmax, face_ymax = face_coords
         frame_out = cv2.rectangle(frame, (face_xmin, face_ymin), (face_xmax, face_ymax), (0, 255, 0), 1)
+        image_face = frame.copy()[face_ymin:face_ymax, face_xmin:face_xmax]
         
         # Get the landmarks from the face crop
-        image_face = frame.copy()[face_ymin:face_ymax, face_xmin:face_xmax]
         facial_landmarks_coords_crop = model_facial_landmarks_detection.predict(image_face)
         
         # draw facial landmarks
         frame_out = draw_landmarks(facial_landmarks_coords_crop, face_coords, frame_out)
+        
+        # Get the head pose estimation from the face crop
+        head_pose_coords = model_head_pose_estimation.predict(image_face)
+        angle_p_fc, angle_r_fc, angle_y_fc = head_pose_coords
+        
+        # TODO: draw head pose on face
+        
         
         # Write out the output frame 
         out.write(frame_out)
