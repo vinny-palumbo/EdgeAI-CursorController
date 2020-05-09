@@ -71,3 +71,22 @@ class FacialLandmarksDetectionModel:
         
         return coords
         
+        
+    def draw_landmarks(self, landmarks_crop, face_coords, image):
+
+        PAD = 5 # Padding pixel size
+        LANDMARKS_COLOR = (0,255,0) # green
+        face_xmin, face_ymin, _, _ = face_coords
+        
+        for landmark_crop in landmarks_crop: 
+            
+            x_crop = landmark_crop[0]
+            y_crop = landmark_crop[1]
+            
+            x = face_xmin + x_crop
+            y = face_ymin + y_crop
+            
+            # draw landmark point on original frame
+            image[y-PAD: y+PAD, x-PAD: x+PAD] = LANDMARKS_COLOR
+            
+        return image

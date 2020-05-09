@@ -44,26 +44,6 @@ def build_argparser():
 
     return parser
     
-
-def draw_landmarks(facial_landmarks_coords_crop, face_coords, image):
-
-    PAD = 5 # Padding pixel size
-    face_xmin, face_ymin, _, _ = face_coords
-    
-    for facial_landmark_coords_crop in facial_landmarks_coords_crop: 
-        
-        facial_landmark_x_crop = facial_landmark_coords_crop[0]
-        facial_landmark_y_crop = facial_landmark_coords_crop[1]
-        
-        facial_landmark_x = face_xmin + facial_landmark_x_crop
-        facial_landmark_y = face_ymin + facial_landmark_y_crop
-        
-        # draw landmark point on original frame
-        landmarks_color = (0,255,0) # green
-        image[facial_landmark_y-PAD: facial_landmark_y+PAD, facial_landmark_x-PAD: facial_landmark_x+PAD] = landmarks_color
-        
-    return image
-    
     
 def infer_on_stream(args):
     """
@@ -123,7 +103,7 @@ def infer_on_stream(args):
         facial_landmarks_coords_crop = model_facial_landmarks_detection.predict(image_face)
         
         # draw facial landmarks
-        frame_out = draw_landmarks(facial_landmarks_coords_crop, face_coords, frame_out)
+        frame_out = model_facial_landmarks_detection.draw_landmarks(facial_landmarks_coords_crop, face_coords, frame_out)
         
         # Get the head pose estimation from the face crop
         head_pose_coords = model_head_pose_estimation.predict(image_face)
@@ -131,7 +111,7 @@ def infer_on_stream(args):
         
         # TODO: draw head pose on face
         
-        
+
         # Write out the output frame 
         out.write(frame_out)
         
