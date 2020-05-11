@@ -6,7 +6,6 @@ import cv2
 from argparse import ArgumentParser
 from sys import platform
 
-from input_feeder import InputFeeder
 from mouse_controller import MouseController
 from model_face_detection import FaceDetectionModel
 from model_facial_landmarks_detection import FacialLandmarksDetectionModel
