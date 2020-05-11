@@ -90,3 +90,27 @@ class FacialLandmarksDetectionModel:
             image[y-PAD: y+PAD, x-PAD: x+PAD] = LANDMARKS_COLOR
             
         return image
+        
+        
+    def crop_eyes(self, landmarks_crop, face_coords, image):
+        
+        PAD = 30 # eye box pixel size
+        landmarks_eyes_crop = landmarks_crop[:2]
+        face_xmin, face_ymin, _, _ = face_coords
+        
+        images_eyes = []
+        for landmark_eye_crop in landmarks_eyes_crop:
+        
+            x_crop = landmark_eye_crop[0]
+            y_crop = landmark_eye_crop[1]
+            
+            x = face_xmin + x_crop
+            y = face_ymin + y_crop
+            
+            # crop eye
+            image_eye = image.copy()[y-PAD: y+PAD, x-PAD: x+PAD]
+            
+            images_eyes.append(image_eye)
+            
+        return images_eyes
+        
