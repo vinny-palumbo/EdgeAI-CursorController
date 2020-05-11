@@ -15,9 +15,6 @@ from model_gaze_estimation import GazeEstimationModel
 
 PATH_MODELS_FOLDER = os.path.abspath(r'C:\Users\vin_p\Github\EdgeAI-CursorController\models\intel')
 PATH_MODEL_FACE_DETECTION = os.path.join(PATH_MODELS_FOLDER, r'face-detection-adas-binary-0001\FP32-INT1\face-detection-adas-binary-0001')
-PATH_MODEL_FACIAL_LANDMARKS_DETECTION = os.path.join(PATH_MODELS_FOLDER, r'landmarks-regression-retail-0009\FP32\landmarks-regression-retail-0009')
-PATH_MODEL_HEAD_POSE_ESTIMATION = os.path.join(PATH_MODELS_FOLDER, r'head-pose-estimation-adas-0001\FP32\head-pose-estimation-adas-0001')
-PATH_MODEL_GAZE_ESTIMATION = os.path.join(PATH_MODELS_FOLDER, r'gaze-estimation-adas-0002\FP32\gaze-estimation-adas-0002')
 
 # Get correct params according to the OS
 if platform == "darwin": # for MACs
@@ -34,14 +31,17 @@ def build_argparser():
     """
     parser = ArgumentParser()
     parser.add_argument("-i", "--input", required=True, type=str,
-                        help="Path to image or video file")
+                        help="Path to video file or CAM for webcam")
     parser.add_argument("-d", "--device", type=str, default="CPU",
                         help="Specify the target device to infer on: "
                              "CPU, GPU, FPGA or MYRIAD is acceptable. Sample "
                              "will look for a suitable plugin for device "
                              "specified (CPU by default)")
+    parser.add_argument("-p", "--precision", type=str, default="FP32",
+                        help="Precision of the Intermediate Representation models"
+                        "(FP32 by default)")
     parser.add_argument("-pt", "--prob_threshold", type=float, default=0.5,
-                        help="Probability threshold for detections filtering"
+                        help="Probability threshold for face detections filtering"
                         "(0.5 by default)")
 
     return parser
@@ -56,6 +56,10 @@ def infer_on_stream(args, mouse_controller):
     :return: None
     """
     
+    PATH_MODEL_FACIAL_LANDMARKS_DETECTION = os.path.join(PATH_MODELS_FOLDER, r'landmarks-regression-retail-0009\{}\landmarks-regression-retail-0009'.format(args.precision))
+    PATH_MODEL_HEAD_POSE_ESTIMATION = os.path.join(PATH_MODELS_FOLDER, r'head-pose-estimation-adas-0001\{}\head-pose-estimation-adas-0001'.format(args.precision))
+    PATH_MODEL_GAZE_ESTIMATION = os.path.join(PATH_MODELS_FOLDER, r'gaze-estimation-adas-0002\{}\gaze-estimation-adas-0002'.format(args.precision))
+
     # Initialise the models
     model_face_detection = FaceDetectionModel(PATH_MODEL_FACE_DETECTION, args.device, args.prob_threshold)
     model_facial_landmarks_detection = FacialLandmarksDetectionModel(PATH_MODEL_FACIAL_LANDMARKS_DETECTION, args.device)
@@ -146,7 +150,7 @@ def infer_on_stream(args, mouse_controller):
     total_inference_time = round(time.time()-start_inference_time, 2)
     fps = round(counter/total_inference_time, 2)
     
-    log_filename = 'logs/{}_{}.txt'.format(args.device, 'FP32')
+    log_filename = 'logs/{}_{}.txt'.format(args.device, args.precision)
     with open(log_filename, 'w') as f:
         f.write('total_inference_time: ' + str(total_inference_time)+'\n')
         f.write('fps: ' + str(fps)+'\n')
