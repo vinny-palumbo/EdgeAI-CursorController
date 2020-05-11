@@ -4,7 +4,15 @@
 |-----------------------|---------------|
 | Programming Language: |  Python 3.6 |
 
-This application detects a person's eye gaze direction from a video file or webcam feed, and moves the computer cursor accordingly. This could be used, for example, by a physically-impaired person who wants to naviguate on a computer without a mouse. The app uses the Inference Engine included in the Intel® Distribution of OpenVINO™ Toolkit.
+![cursor-controller-demo](./assets/cursor-controller-demo.gif)
+
+This application estimates a person's gaze direction from a video file or webcam feed, and moves a computer cursor accordingly. This could be used, for example, by a physically-impaired person who wants to naviguate on a computer without using a mouse. The app uses the Inference Engine included in the Intel® Distribution of OpenVINO™ Toolkit.
+
+This is the gaze estimation pipeline:
+
+![pipeline](./assets/pipeline.png)
+
+A first model detects faces in each frame. A second model detects the facial landmarks from the previous face detection, and a third model estimates the head pose also from the previous face detection. The images of the person's left and right eye are fed to a final model, along with the head pose estimation, to finally estimate the person's gaze direction.
 
 ## Project Set Up and Installation
 
