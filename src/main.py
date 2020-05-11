@@ -7,6 +7,7 @@ from argparse import ArgumentParser
 from sys import platform
 
 from input_feeder import InputFeeder
+from mouse_controller import MouseController
 from model_face_detection import FaceDetectionModel
 from model_facial_landmarks_detection import FacialLandmarksDetectionModel
 from model_head_pose_estimation import HeadPoseEstimationModel
@@ -47,7 +48,7 @@ def build_argparser():
     return parser
     
     
-def infer_on_stream(args):
+def infer_on_stream(args, mouse_controller):
     """
     Initialize the inference network, stream video to network,
     and output stats and video.
@@ -95,7 +96,12 @@ def infer_on_stream(args):
         face_coords = model_face_detection.predict(frame)
         if len(face_coords) > 1:
             print('Multiple faces detected')
-            quit()
+            out.write(frame)
+            continue
+        elif len(face_coords) == 0:
+            print('No face detected')
+            out.write(frame)
+            continue
         
         # draw face detection bbox on original frame
         face_coords = face_coords[0]
@@ -120,7 +126,10 @@ def infer_on_stream(args):
         
 
         # Get gaze estimation coords
-        gaze_coords = model_gaze_estimation.predict(image_eye_left, image_eye_right, head_pose_coords)
+        gaze_y, gaze_x, gaze_z = model_gaze_estimation.predict(image_eye_left, image_eye_right, head_pose_coords)
+        
+        # Move mouse
+        mouse_controller.move(-gaze_x, gaze_y)
         
         # Write out the output frame 
         out.write(frame_out)
@@ -143,8 +152,10 @@ def main():
     """
     # Grab command line args
     args = build_argparser().parse_args()
+    # get mouse controller
+    mc = MouseController()
     # Perform inference on the input stream
-    infer_on_stream(args)
+    infer_on_stream(args, mc)
 
 
 if __name__ == '__main__':

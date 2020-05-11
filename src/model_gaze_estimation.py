@@ -41,7 +41,7 @@ class GazeEstimationModel:
         
         coords = np.squeeze(outputs[self.output_name]).tolist()
         
-        return coords
+        return tuple(coords)
         
         
     def predict(self, image_eye_left, image_eye_right, head_pose_coords):
