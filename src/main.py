@@ -10,12 +10,14 @@ from input_feeder import InputFeeder
 from model_face_detection import FaceDetectionModel
 from model_facial_landmarks_detection import FacialLandmarksDetectionModel
 from model_head_pose_estimation import HeadPoseEstimationModel
+from model_gaze_estimation import GazeEstimationModel
 
 
 PATH_MODELS_FOLDER = os.path.abspath(r'C:\Users\vin_p\Github\EdgeAI-CursorController\models\intel')
 PATH_MODEL_FACE_DETECTION = os.path.join(PATH_MODELS_FOLDER, r'face-detection-adas-binary-0001\FP32-INT1\face-detection-adas-binary-0001')
 PATH_MODEL_FACIAL_LANDMARKS_DETECTION = os.path.join(PATH_MODELS_FOLDER, r'landmarks-regression-retail-0009\FP32\landmarks-regression-retail-0009')
 PATH_MODEL_HEAD_POSE_ESTIMATION = os.path.join(PATH_MODELS_FOLDER, r'head-pose-estimation-adas-0001\FP32\head-pose-estimation-adas-0001')
+PATH_MODEL_GAZE_ESTIMATION = os.path.join(PATH_MODELS_FOLDER, r'gaze-estimation-adas-0002\FP32\gaze-estimation-adas-0002')
 
 # Get correct params according to the OS
 if platform == "darwin": # for MACs
@@ -58,11 +60,13 @@ def infer_on_stream(args):
     model_face_detection = FaceDetectionModel(PATH_MODEL_FACE_DETECTION, args.device, args.prob_threshold)
     model_facial_landmarks_detection = FacialLandmarksDetectionModel(PATH_MODEL_FACIAL_LANDMARKS_DETECTION, args.device)
     model_head_pose_estimation = HeadPoseEstimationModel(PATH_MODEL_HEAD_POSE_ESTIMATION, args.device)
+    model_gaze_estimation = GazeEstimationModel(PATH_MODEL_GAZE_ESTIMATION, args.device)
     
     # Load the models
     model_face_detection.load_model()
     model_facial_landmarks_detection.load_model()
     model_head_pose_estimation.load_model()
+    model_gaze_estimation.load_model()
     
     # Check if the input is a webcam
     if args.input == 'CAM':
@@ -115,6 +119,9 @@ def infer_on_stream(args):
         # TODO: draw head pose on face
         
 
+        # Get gaze estimation coords
+        gaze_coords = model_gaze_estimation.predict(image_eye_left, image_eye_right, head_pose_coords)
+        
         # Write out the output frame 
         out.write(frame_out)
         
