@@ -18,8 +18,6 @@ class HeadPoseEstimationModel:
             raise ValueError("Could not Initialise the network. Have you enterred the correct model path?")
         self.input_name=next(iter(self.model.inputs))
         self.input_shape=self.model.inputs[self.input_name].shape
-        self.output_name=next(iter(self.model.outputs))
-        self.output_shape=self.model.outputs[self.output_name].shape
         self.net = None
 
 
@@ -39,9 +37,9 @@ class HeadPoseEstimationModel:
 
     def get_coords(self, outputs):
         
-        angle_p_fc = np.squeeze(outputs['angle_p_fc'])
-        angle_r_fc = np.squeeze(outputs['angle_r_fc'])
-        angle_y_fc = np.squeeze(outputs['angle_y_fc'])
+        angle_p_fc = np.squeeze(outputs['angle_p_fc']).tolist()
+        angle_r_fc = np.squeeze(outputs['angle_r_fc']).tolist()
+        angle_y_fc = np.squeeze(outputs['angle_y_fc']).tolist()
         
         coords = (angle_p_fc, angle_r_fc, angle_y_fc)
         

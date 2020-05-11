@@ -39,7 +39,7 @@ class FacialLandmarksDetectionModel:
 
     def preprocess_outputs(self, outputs):
         
-        outputs = np.squeeze(next(iter(outputs.values())))
+        outputs = np.squeeze(outputs[self.output_name])
         
         return outputs
         
@@ -112,5 +112,5 @@ class FacialLandmarksDetectionModel:
             
             images_eyes.append(image_eye)
             
-        return images_eyes
+        return tuple(images_eyes)
         

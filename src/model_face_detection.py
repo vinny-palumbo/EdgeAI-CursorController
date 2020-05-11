@@ -40,7 +40,7 @@ class FaceDetectionModel:
 
     def preprocess_outputs(self, outputs):
 
-        detections = outputs['detection_out'][-1,-1,:,:] # outputs['detection_out'] shape is 1x1x200x7
+        detections = outputs[self.output_name][-1,-1,:,:] # outputs shape is 1x1x200x7
 
         coords= []
         for detection in detections: 

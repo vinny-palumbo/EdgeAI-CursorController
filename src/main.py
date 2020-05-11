@@ -102,18 +102,18 @@ def infer_on_stream(args):
         # Get the landmarks from the face crop
         facial_landmarks_coords_crop = model_facial_landmarks_detection.predict(image_face)
         
+        # get eyes crops for the gaze estimation model
+        images_eyes = model_facial_landmarks_detection.crop_eyes(facial_landmarks_coords_crop, face_coords, frame_out)
+        image_eye_left, image_eye_right = images_eyes
+        
         # draw facial landmarks
         frame_out = model_facial_landmarks_detection.draw_landmarks(facial_landmarks_coords_crop, face_coords, frame_out)
         
-        # get eyes crops for the gaze estimation model
-        images_eyes = model_facial_landmarks_detection.crop_eyes(facial_landmarks_coords_crop, face_coords, frame_out)
-        
         # Get the head pose estimation from the face crop
         head_pose_coords = model_head_pose_estimation.predict(image_face)
-        angle_p_fc, angle_r_fc, angle_y_fc = head_pose_coords
         
         # TODO: draw head pose on face
-
+        
 
         # Write out the output frame 
         out.write(frame_out)
