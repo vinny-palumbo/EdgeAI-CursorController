@@ -137,7 +137,7 @@ def infer_on_stream(args, mouse_controller):
         gaze_y, gaze_x, gaze_z = model_gaze_estimation.predict(image_eye_left, image_eye_right, head_pose_coords)
         
         # Move mouse
-        #mouse_controller.move(-gaze_x, gaze_y)
+        mouse_controller.move(-gaze_x, gaze_y)
         
         # Write out the output frame 
         out.write(frame_out)
