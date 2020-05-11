@@ -30,11 +30,13 @@ The command line arguments are as follow:
 - p: Precision of the Intermediate Representation models (FP32 by default)
 - pt: Probability threshold for face detections filtering (0.5 by default)
 
-For example, you could run ```python src/main.py -i "CAM" -d GPU -p FP16 -pt 0.8```
+For example, you could run: ```python src/main.py -i "CAM" -d GPU -p FP16 -pt 0.8```
 
-An ```output_video.mp4 file``` will be created in the ```results/``` folder with the face and facial landmarks detections drawn over the video.
+An ```output_video.mp4``` file will be created in the ```results/``` folder with the face and facial landmarks detections drawn over the video.
 
-A log file (titled ```<device>_<precision>.txt```) will be created in the ```logs/``` folder with the following statistics: total time to run the inference on the input, frames per second, and total time to load the models. 
+A log file (titled ```<device>_<precision>.txt```) will be created in the ```logs/``` folder with the following statistics: - Total time to run the inference on the input
+- Frames per second
+- Total time to load the models. 
 
 ## Benchmarks
 
@@ -44,18 +46,14 @@ On CPU:
 | Statistic/Precision            |       FP32       |       FP16       |       FP32-INT8       |
 |-----------------------|---------------|---------------|---------------|
 | Inference time (in secs): |       63.22      |        63.01     |      62.64       |
-|-----------------------|---------------|---------------|---------------|
 | Frames per second: |       9.43      |       9.46      |       9.51      |
-|-----------------------|---------------|---------------|---------------|
 | Loading time (in secs): |      0.41       |      0.44       |       1.54      |
 
 On GPU:
 | Statistic/Precision            |       FP32       |       FP16       |       FP32-INT8       |
 |-----------------------|---------------|---------------|---------------|
 | Inference time (in secs): |       76.67      |       73.87      |       74.29      |
-|-----------------------|---------------|---------------|---------------|
 | Frames per second: |       7.77      |       8.07      |       8.02      |
-|-----------------------|---------------|---------------|---------------|
 | Loading time (in secs): |       33.34      |       33.82      |        39.09     |
 
 ## Results
