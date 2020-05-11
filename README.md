@@ -34,7 +34,8 @@ For example, you could run: ```python src/main.py -i "CAM" -d GPU -p FP16 -pt 0.
 
 An ```output_video.mp4``` file will be created in the ```results/``` folder with the face and facial landmarks detections drawn over the video.
 
-A log file (titled ```<device>_<precision>.txt```) will be created in the ```logs/``` folder with the following statistics: - Total time to run the inference on the input
+A log file (titled ```<device>_<precision>.txt```) will be created in the ```logs/``` folder with the following statistics:
+- Total time to run the inference on the input
 - Frames per second
 - Total time to load the models. 
 
@@ -63,12 +64,12 @@ The time to load the models on a GPU is significantly longer than on a CPU, so C
 As far as model precision goes, the faster models (low inference time) on CPU are FP32-INT8, FP16 and FP32 in that order. On GPU, the faster models are FP16, FP32-INT8 and FP32 in that order. 
 
 
-### Edge Cases
+## Edge Cases
 
 If there are multiple faces or no face detected, the mouse pointer will stop moving until only one face is detected.
 
 
-### Future improvements
+## Future improvements
 * use Async Inference to improve performance
 * benchmark the running times of different parts of the preprocessing and inference pipeline and let the user specify the CLI argument if they want to see the benchmark timing. Use the get_perf_counts API to print the time it takes for each layer in the model
 * use the VTune Amplifier to find hotspots in your Inference Engine Pipeline
