@@ -63,10 +63,12 @@ def infer_on_stream(args, mouse_controller):
     model_gaze_estimation = GazeEstimationModel(PATH_MODEL_GAZE_ESTIMATION, args.device)
     
     # Load the models
+    start_models_load_time=time.time()
     model_face_detection.load_model()
     model_facial_landmarks_detection.load_model()
     model_head_pose_estimation.load_model()
     model_gaze_estimation.load_model()
+    total_models_load_time = round(time.time() - start_models_load_time, 2)
     
     # Check if the input is a webcam
     if args.input == 'CAM':
@@ -83,12 +85,15 @@ def infer_on_stream(args, mouse_controller):
     out = cv2.VideoWriter('results/output_video.mp4', CODEC, CAP_FPS, (CAP_WIDTH,CAP_HEIGHT))
     
     # Loop until stream is over 
+    counter=0
+    start_inference_time=time.time()
     while cap.isOpened():
         
         # Read from the video capture 
         flag, frame = cap.read()
         if not flag:
             break
+        counter+=1
         key_pressed = cv2.waitKey(60)
         
         # Get face detection crops
@@ -128,7 +133,7 @@ def infer_on_stream(args, mouse_controller):
         gaze_y, gaze_x, gaze_z = model_gaze_estimation.predict(image_eye_left, image_eye_right, head_pose_coords)
         
         # Move mouse
-        mouse_controller.move(-gaze_x, gaze_y)
+        #mouse_controller.move(-gaze_x, gaze_y)
         
         # Write out the output frame 
         out.write(frame_out)
@@ -137,6 +142,16 @@ def infer_on_stream(args, mouse_controller):
         if key_pressed == 27:
             break
     
+    # log stats
+    total_inference_time = round(time.time()-start_inference_time, 2)
+    fps = round(counter/total_inference_time, 2)
+    
+    log_filename = 'logs/{}_{}.txt'.format(args.device, 'FP32')
+    with open(log_filename, 'w') as f:
+        f.write('total_inference_time: ' + str(total_inference_time)+'\n')
+        f.write('fps: ' + str(fps)+'\n')
+        f.write('total_models_load_time: ' + str(total_models_load_time)+'\n')
+
     # Release the capture and destroy any OpenCV windows
     out.release()
     cap.release()
