@@ -14,6 +14,7 @@ This is the gaze estimation pipeline:
 
 A first model detects faces in each frame. A second model detects the facial landmarks from the previous face detection, and a third model estimates the head pose also from the previous face detection. The images of the person's left and right eye are fed to a final model, along with the head pose estimation, to finally estimate the person's gaze direction.
 
+
 ## Project Set Up and Installation
 
 - Install OpenVINO for [Windows](https://docs.openvinotoolkit.org/latest/_docs_install_guides_installing_openvino_windows.html), [Linux](https://docs.openvinotoolkit.org/latest/_docs_install_guides_installing_openvino_linux.html) or [macOS](https://docs.openvinotoolkit.org/latest/_docs_install_guides_installing_openvino_macos.html)
@@ -21,14 +22,48 @@ A first model detects faces in each frame. A second model detects the facial lan
     - Windows: ```"C:\Program Files (x86)\IntelSWTools\openvino\bin\setupvars.bat"```
     - Linux: ```source /opt/intel/openvino/bin/setupvars.sh -pyver 3.6```
 - Create and activate a virtual environment with Python 3.6
-- Install the project requirements: ```pip install -r requirements.txt```
-- Download the pre-trained models by running ```download_models.bat``` after making sure the paths match your setup
+- Install the project requirements by running ```pip install -r requirements.txt```
+- Download the pre-trained models in the ```models/``` folder by running ```download_models.bat``` from the root directory
 
 
 ## Demo
 
 To make sure your installation is successful, run the demo:
 ```python src/main.py -i "bin\demo.mp4"```
+
+An ```output_video.mp4``` file will be created in the ```results/``` folder with the face and facial landmarks detections drawn over the video.
+
+A ```logs.txt``` file will be created in the ```logs/``` folder with info-level logs (eg: multiple faces detected, no face detected).
+
+A ```<device>_<precision>.txt``` file will also be created in the ```logs/``` folder with the following statistics:
+- Total time to run the inference on the input
+- Frames per second
+- Total time to load the models. 
+
+The directory tree should look like this:
+.
+├── assets
+├── bin
+│   └── demo.mp4
+├── download_models.bat
+├── logs
+│   ├── logs.txt
+│   ├── CPU_FP16.txt
+│   ├── ...
+├── models
+├── README.md
+├── requirements.txt
+├── results
+│   └── output_video.mp4
+└── src
+    ├── main.py
+    ├── model_face_detection.py
+    ├── model_facial_landmarks_detection.py
+    ├── model_gaze_estimation.py
+    ├── model_head_pose_estimation.py
+    ├── model.py
+    └── mouse_controller.py
+
 
 ## Documentation
 
@@ -39,13 +74,6 @@ The command line arguments are as follow:
 - pt: Probability threshold for face detections filtering (0.5 by default)
 
 For example, you could run: ```python src/main.py -i "CAM" -d GPU -p FP16 -pt 0.8```
-
-An ```output_video.mp4``` file will be created in the ```results/``` folder with the face and facial landmarks detections drawn over the video.
-
-A log file (titled ```<device>_<precision>.txt```) will be created in the ```logs/``` folder with the following statistics:
-- Total time to run the inference on the input
-- Frames per second
-- Total time to load the models. 
 
 ## Benchmarks
 
@@ -64,6 +92,7 @@ On GPU:
 | Inference time (in secs): |       76.67      |       73.87      |         74.29         |
 | Frames per second:        |        7.77      |        8.07      |          8.02         |
 | Loading time (in secs):   |       33.34      |       33.82      |         39.09         |
+
 
 ## Results
 
