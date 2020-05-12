@@ -47,4 +47,11 @@ class FaceDetectionModel(Model):
         coords = self.get_coords(outputs, image)
         
         return coords
+        
     
+    def draw_face(self, coords, image):
+    
+        xmin, ymin, xmax, ymax = coords
+        image = cv2.rectangle(image, (xmin, ymin), (xmax, ymax), (0, 255, 0), 1)
+        
+        return image

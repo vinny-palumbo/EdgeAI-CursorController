@@ -144,7 +144,7 @@ def infer_on_stream(args, mouse_controller):
             if args.output:
                 
                 # draw face detection bbox on original frame
-                frame_out = cv2.rectangle(frame, (face_xmin, face_ymin), (face_xmax, face_ymax), (0, 255, 0), 1)
+                frame_out = model_face_detection.draw_face(face_coords, frame)
                 
                 # draw facial landmarks
                 frame_out = model_facial_landmarks_detection.draw_eyes(facial_landmarks_coords_crop, face_coords, frame_out)
