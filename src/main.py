@@ -136,19 +136,23 @@ def infer_on_stream(args, mouse_controller):
             head_pose_coords = model_head_pose_estimation.predict(image_face)
             
             # Get gaze estimation coords
-            gaze_y, gaze_x, gaze_z = model_gaze_estimation.predict(image_eye_left, image_eye_right, head_pose_coords)
+            gaze_coords = model_gaze_estimation.predict(image_eye_left, image_eye_right, head_pose_coords)
+            gaze_x, gaze_y, gaze_z = gaze_coords
             
             # Move mouse
-            #mouse_controller.move(-gaze_x, gaze_y) # we need to reverse the x coord because mirror effect
+            mouse_controller.move(-gaze_y, gaze_x) # the y coord is reversed
             
             if args.output:
                 
                 # draw face detection bbox on original frame
                 frame_out = model_face_detection.draw_face(face_coords, frame)
                 
-                # draw facial landmarks
+                # draw eyes
                 frame_out = model_facial_landmarks_detection.draw_eyes(facial_landmarks_coords_crop, face_coords, frame_out)
-            
+                    
+                # draw gaze direction   
+                frame_out = model_gaze_estimation.draw_gaze_direction(gaze_coords, face_coords, frame_out)
+                 
                 # Write out the output frame 
                 out.write(frame_out)
             

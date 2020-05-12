@@ -38,3 +38,24 @@ class GazeEstimationModel(Model):
         
         return coords
         
+        
+    def draw_gaze_direction(self, gaze_coords, face_coords, image):
+        
+        SCALE_FACTOR = 256
+        
+        gaze_x, gaze_y, _ = gaze_coords
+        face_xmin, face_ymin, face_xmax, face_ymax = face_coords
+        
+        line_start_x = (face_xmin + face_xmax) // 2
+        line_start_y = (face_ymin + face_ymax) // 2
+        line_end_x = int(line_start_x + gaze_x * SCALE_FACTOR)
+        line_end_y = int(line_start_y + gaze_y * SCALE_FACTOR * -1) # the y coord is reversed
+        
+        image = cv2.arrowedLine(image, 
+                                (line_start_x, line_start_y),
+                                (line_end_x, line_end_y), 
+                                color=[0, 255, 0], 
+                                thickness=2) 
+                                        
+        return image    
+        
