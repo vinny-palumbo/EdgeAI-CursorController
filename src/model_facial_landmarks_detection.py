@@ -88,3 +88,24 @@ class FacialLandmarksDetectionModel(Model):
             
         return tuple(images_eyes)
         
+        
+    def draw_eyes(self, landmarks_crop, face_coords, image):
+    
+        PAD = 30 # eye box pixel size
+        landmarks_eyes_crop = landmarks_crop[:2]
+        face_xmin, face_ymin, _, _ = face_coords
+        
+        for landmark_eye_crop in landmarks_eyes_crop:
+        
+            x_crop = landmark_eye_crop[0]
+            y_crop = landmark_eye_crop[1]
+            
+            x = face_xmin + x_crop
+            y = face_ymin + y_crop
+            
+            # draw bbox
+            cv2.rectangle(image, (x-PAD, y-PAD), (x+PAD, y+PAD), (0, 255, 0), 1)
+            
+        return image
+    
+        

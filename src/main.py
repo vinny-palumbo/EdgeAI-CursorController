@@ -147,7 +147,7 @@ def infer_on_stream(args, mouse_controller):
                 frame_out = cv2.rectangle(frame, (face_xmin, face_ymin), (face_xmax, face_ymax), (0, 255, 0), 1)
                 
                 # draw facial landmarks
-                frame_out = model_facial_landmarks_detection.draw_landmarks(facial_landmarks_coords_crop, face_coords, frame_out)
+                frame_out = model_facial_landmarks_detection.draw_eyes(facial_landmarks_coords_crop, face_coords, frame_out)
             
                 # Write out the output frame 
                 out.write(frame_out)
