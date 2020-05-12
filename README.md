@@ -41,28 +41,7 @@ A ```<device>_<precision>.txt``` file will also be created in the ```logs/``` fo
 - Total time to load the models. 
 
 The directory tree should look like this:
-.
-├── assets
-├── bin
-│   └── demo.mp4
-├── download_models.bat
-├── logs
-│   ├── logs.txt
-│   ├── CPU_FP16.txt
-│   ├── ...
-├── models
-├── README.md
-├── requirements.txt
-├── results
-│   └── output_video.mp4
-└── src
-    ├── main.py
-    ├── model_face_detection.py
-    ├── model_facial_landmarks_detection.py
-    ├── model_gaze_estimation.py
-    ├── model_head_pose_estimation.py
-    ├── model.py
-    └── mouse_controller.py
+![directory-tree](./assets/directory-tree.png)
 
 
 ## Documentation
