@@ -16,39 +16,25 @@ class FaceDetectionModel(Model):
         self.output_name=next(iter(self.model.outputs))
         self.output_shape=self.model.outputs[self.output_name].shape
         self.threshold=threshold
-        
-
-    def preprocess_outputs(self, outputs):
-
-        detections = outputs[self.output_name][-1,-1,:,:] # outputs shape is 1x1x200x7
-
-        coords= []
-        for detection in detections: 
-            conf = detection[2]
-            if conf >= self.threshold:
-                xmin = detection[3]
-                ymin = detection[4]
-                xmax = detection[5]
-                ymax = detection[6]
-                
-                coords.append([xmin,ymin,xmax,ymax])
-        
-        return coords
     
     
-    def get_coords(self, detections, image):
+    def get_coords(self, outputs, image):
     
         IMG_HEIGHT, IMG_WIDTH, _ = image.shape
         
+        detections = outputs[self.output_name][-1,-1,:,:] # outputs shape is 1x1x200x7
+        
         coords = []
         for detection in detections: 
-            # scale bbox coords
-            xmin = int(detection[0] * IMG_WIDTH)
-            ymin = int(detection[1] * IMG_HEIGHT)
-            xmax = int(detection[2] * IMG_WIDTH)
-            ymax = int(detection[3] * IMG_HEIGHT)
-            
-            coords.append([xmin,ymin,xmax,ymax])
+            conf = detection[2]
+            if conf >= self.threshold:
+                # scale bbox coords
+                xmin = int(detection[3] * IMG_WIDTH)
+                ymin = int(detection[4] * IMG_HEIGHT)
+                xmax = int(detection[5] * IMG_WIDTH)
+                ymax = int(detection[6] * IMG_HEIGHT)
+                
+                coords.append([xmin,ymin,xmax,ymax])
             
         return coords
         
@@ -58,7 +44,6 @@ class FaceDetectionModel(Model):
         image_p = self.preprocess_input(image.copy(), self.input_shape)
         input_dict={self.input_name: image_p}
         outputs = self.net.infer(input_dict)
-        outputs = self.preprocess_outputs(outputs)
         coords = self.get_coords(outputs, image)
         
         return coords

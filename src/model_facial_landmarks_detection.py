@@ -16,17 +16,12 @@ class FacialLandmarksDetectionModel(Model):
         self.output_name=next(iter(self.model.outputs))
         self.output_shape=self.model.outputs[self.output_name].shape
         
-    
-    def preprocess_outputs(self, outputs):
-        
-        outputs = np.squeeze(outputs[self.output_name])
-        
-        return outputs
-        
         
     def get_coords(self, outputs, image):
     
         IMG_HEIGHT, IMG_WIDTH, _ = image.shape
+        
+        outputs = np.squeeze(outputs[self.output_name])
     
         x_coords = outputs[0::2] * IMG_WIDTH
         x_coords = [int(i) for i in x_coords]
@@ -46,7 +41,6 @@ class FacialLandmarksDetectionModel(Model):
         image_p = self.preprocess_input(image.copy(), self.input_shape)
         input_dict={self.input_name: image_p}
         outputs = self.net.infer(input_dict)
-        outputs = self.preprocess_outputs(outputs)
         coords = self.get_coords(outputs, image)
         
         return coords
