@@ -41,6 +41,7 @@ A ```<device>_<precision>.txt``` file will also be created in the ```logs/``` fo
 - Total time to load the models. 
 
 The directory tree should look like this:
+
 ![directory-tree](./assets/directory-tree.png)
 
 
