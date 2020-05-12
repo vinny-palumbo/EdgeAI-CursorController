@@ -15,6 +15,7 @@ class FacialLandmarksDetectionModel(Model):
         self.input_shape=self.model.inputs[self.input_name].shape
         self.output_name=next(iter(self.model.outputs))
         self.output_shape=self.model.outputs[self.output_name].shape
+        self.PAD_EYE = 40 # eye box pixel size
         
         
     def get_coords(self, outputs, image):
@@ -68,7 +69,6 @@ class FacialLandmarksDetectionModel(Model):
         
     def crop_eyes(self, landmarks_crop, face_coords, image):
         
-        PAD = 30 # eye box pixel size
         landmarks_eyes_crop = landmarks_crop[:2]
         face_xmin, face_ymin, _, _ = face_coords
         
@@ -82,7 +82,7 @@ class FacialLandmarksDetectionModel(Model):
             y = face_ymin + y_crop
             
             # crop eye
-            image_eye = image.copy()[y-PAD: y+PAD, x-PAD: x+PAD]
+            image_eye = image.copy()[y-self.PAD_EYE: y+self.PAD_EYE, x-self.PAD_EYE: x+self.PAD_EYE]
             
             images_eyes.append(image_eye)
             
@@ -91,7 +91,6 @@ class FacialLandmarksDetectionModel(Model):
         
     def draw_eyes(self, landmarks_crop, face_coords, image):
     
-        PAD = 30 # eye box pixel size
         landmarks_eyes_crop = landmarks_crop[:2]
         face_xmin, face_ymin, _, _ = face_coords
         
@@ -104,7 +103,7 @@ class FacialLandmarksDetectionModel(Model):
             y = face_ymin + y_crop
             
             # draw bbox
-            cv2.rectangle(image, (x-PAD, y-PAD), (x+PAD, y+PAD), (0, 255, 0), 1)
+            cv2.rectangle(image, (x-self.PAD_EYE, y-self.PAD_EYE), (x+self.PAD_EYE, y+self.PAD_EYE), (0, 255, 0), 1)
             
         return image
     
