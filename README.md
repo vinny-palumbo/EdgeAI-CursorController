@@ -1,8 +1,8 @@
 # Cursor Controller
 
-| Details            |              |
+| Details               |               |
 |-----------------------|---------------|
-| Programming Language: |  Python 3.6 |
+| Programming Language: |   Python 3.6  |
 
 ![cursor-controller-demo](./assets/cursor-controller-demo.gif)
 
