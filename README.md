@@ -52,18 +52,18 @@ A log file (titled ```<device>_<precision>.txt```) will be created in the ```log
 Here are the benchmarks results of running the app with multiple hardwares and multiple model precisions. 
 
 On CPU:
-| Statistic/Precision            |       FP32       |       FP16       |       FP32-INT8       |
-|-----------------------|---------------|---------------|---------------|
-| Inference time (in secs): |       63.22      |        63.01     |      62.64       |
-| Frames per second: |       9.43      |       9.46      |       9.51      |
-| Loading time (in secs): |      0.41       |      0.44       |       1.54      |
+| Statistic/Precision       |       FP32       |       FP16       |       FP32-INT8       |
+|---------------------------|------------------|------------------|-----------------------|
+| Inference time (in secs): |       63.22      |        63.01     |         62.64         |
+| Frames per second:        |        9.43      |         9.46     |          9.51         |
+| Loading time (in secs):   |        0.41      |         0.44     |          1.54         |
 
 On GPU:
-| Statistic/Precision            |       FP32       |       FP16       |       FP32-INT8       |
-|-----------------------|---------------|---------------|---------------|
-| Inference time (in secs): |       76.67      |       73.87      |       74.29      |
-| Frames per second: |       7.77      |       8.07      |       8.02      |
-| Loading time (in secs): |       33.34      |       33.82      |        39.09     |
+| Statistic/Precision       |       FP32       |       FP16       |       FP32-INT8       |
+|---------------------------|------------------|------------------|-----------------------|
+| Inference time (in secs): |       76.67      |       73.87      |         74.29         |
+| Frames per second:        |        7.77      |        8.07      |          8.02         |
+| Loading time (in secs):   |       33.34      |       33.82      |         39.09         |
 
 ## Results
 
