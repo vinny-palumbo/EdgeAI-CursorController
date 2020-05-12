@@ -29,7 +29,7 @@ A first model detects faces in each frame. A second model detects the facial lan
 ## Demo
 
 To make sure your installation is successful, run the demo:
-```python src/main.py -i "bin\demo.mp4"```
+```python src/main.py -i "bin\demo.mp4" -o True```
 
 An ```output_video.mp4``` file will be created in the ```results/``` folder with the face and facial landmarks detections drawn over the video.
 
@@ -48,12 +48,14 @@ The directory tree should look like this:
 ## Documentation
 
 The command line arguments are as follow:
-- i: Path to video file or "CAM" for webcam
+- i: Path to video file or "CAM" for webcam (required)
+- m: Path to models folder ("models/intel" by default)
 - d: Target device to infer on: CPU, GPU, FPGA or MYRIAD (CPU by default)
 - p: Precision of the Intermediate Representation models (FP32 by default)
 - pt: Probability threshold for face detections filtering (0.5 by default)
+- o: Whether to generate an annotated output video or not (False by default)
 
-For example, you could run: ```python src/main.py -i "CAM" -d GPU -p FP16 -pt 0.8```
+For example, you could run: ```python src/main.py -i "CAM" -m "models/test" -d GPU -p FP16 -pt 0.8 -o True```
 
 ## Benchmarks
 

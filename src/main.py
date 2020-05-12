@@ -35,16 +35,13 @@ def build_argparser():
     parser.add_argument("-m", "--models_path", type=str, default="models/intel",
                         help="Path to models folder")
     parser.add_argument("-d", "--device", type=str, default="CPU",
-                        help="Specify the target device to infer on: "
-                             "CPU, GPU, FPGA or MYRIAD is acceptable. Sample "
-                             "will look for a suitable plugin for device "
-                             "specified (CPU by default)")
+                        help="Specify the target device to infer on: CPU, GPU, FPGA or MYRIAD is acceptable (CPU by default)")
     parser.add_argument("-p", "--precision", type=str, default="FP32",
-                        help="Precision of the Intermediate Representation models"
-                        "(FP32 by default)")
+                        help="Precision of the Intermediate Representation models (FP32 by default)")
     parser.add_argument("-pt", "--prob_threshold", type=float, default=0.5,
-                        help="Probability threshold for face detections filtering"
-                        "(0.5 by default)")
+                        help="Probability threshold for face detections filtering (0.5 by default)")
+    parser.add_argument("-o", "--output", type=bool, default=False,
+                        help="Choose whether to generate an annotated output video or not (False by default)")
 
     return parser
     
@@ -94,7 +91,8 @@ def infer_on_stream(args, mouse_controller):
     CAP_FPS = int(cap.get(cv2.CAP_PROP_FPS))
     
     # Create a video writer for the output video
-    out = cv2.VideoWriter('results/output_video.mp4', CODEC, CAP_FPS, (CAP_WIDTH,CAP_HEIGHT))
+    if args.output:
+        out = cv2.VideoWriter('results/output_video.mp4', CODEC, CAP_FPS, (CAP_WIDTH,CAP_HEIGHT))
     
     # Loop until stream is over 
     counter=0
@@ -113,43 +111,46 @@ def infer_on_stream(args, mouse_controller):
             face_coords = model_face_detection.predict(frame)
             if len(face_coords) > 1:
                 logging.info('Multiple faces detected')
-                out.write(frame)
+                if args.output:
+                    out.write(frame)
                 continue
             elif len(face_coords) == 0:
                 logging.info('No face detected')
-                out.write(frame)
+                if args.output:
+                    out.write(frame)
                 continue
             
-            # draw face detection bbox on original frame
+            # crop face
             face_coords = face_coords[0]
             face_xmin, face_ymin, face_xmax, face_ymax = face_coords
-            frame_out = cv2.rectangle(frame, (face_xmin, face_ymin), (face_xmax, face_ymax), (0, 255, 0), 1)
             image_face = frame.copy()[face_ymin:face_ymax, face_xmin:face_xmax]
             
             # Get the landmarks from the face crop
             facial_landmarks_coords_crop = model_facial_landmarks_detection.predict(image_face)
             
             # get eyes crops for the gaze estimation model
-            images_eyes = model_facial_landmarks_detection.crop_eyes(facial_landmarks_coords_crop, face_coords, frame_out)
+            images_eyes = model_facial_landmarks_detection.crop_eyes(facial_landmarks_coords_crop, face_coords, frame)
             image_eye_left, image_eye_right = images_eyes
-            
-            # draw facial landmarks
-            frame_out = model_facial_landmarks_detection.draw_landmarks(facial_landmarks_coords_crop, face_coords, frame_out)
             
             # Get the head pose estimation from the face crop
             head_pose_coords = model_head_pose_estimation.predict(image_face)
             
-            # TODO: draw head pose on face
-            
-
             # Get gaze estimation coords
             gaze_y, gaze_x, gaze_z = model_gaze_estimation.predict(image_eye_left, image_eye_right, head_pose_coords)
             
             # Move mouse
             #mouse_controller.move(-gaze_x, gaze_y) # we need to reverse the x coord because mirror effect
             
-            # Write out the output frame 
-            out.write(frame_out)
+            if args.output:
+                
+                # draw face detection bbox on original frame
+                frame_out = cv2.rectangle(frame, (face_xmin, face_ymin), (face_xmax, face_ymax), (0, 255, 0), 1)
+                
+                # draw facial landmarks
+                frame_out = model_facial_landmarks_detection.draw_landmarks(facial_landmarks_coords_crop, face_coords, frame_out)
+            
+                # Write out the output frame 
+                out.write(frame_out)
             
             # Break if escape key pressed
             if key_pressed == 27:
@@ -166,7 +167,8 @@ def infer_on_stream(args, mouse_controller):
             f.write('total_models_load_time: ' + str(total_models_load_time)+'\n')
 
         # Release the capture and destroy any OpenCV windows
-        out.release()
+        if args.output:
+            out.release()
         cap.release()
         cv2.destroyAllWindows()
         
