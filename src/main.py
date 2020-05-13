@@ -17,9 +17,9 @@ from model_gaze_estimation import GazeEstimationModel
 logging.basicConfig(filename='logs/logs.txt',level=logging.DEBUG)
 
 # Get correct params according to the OS
-if platform == "darwin": # for MACs
+if platform in ["darwin", "linux", "linux2"] # for MACs and Linux
     CODEC = cv2.VideoWriter_fourcc('M','J','P','G')
-else: # Windows and Linux
+else: # Windows
     CODEC = 0x00000021
 
 
